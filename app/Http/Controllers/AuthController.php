@@ -30,9 +30,9 @@ class AuthController extends Controller
         }
 
         $filePath = '';
-        if($request->hasFile('profile_image')){
-            $file = $request->file('profile_image');
-            $filePath = $file->store('profile_images', 'public');
+        if($request->hasFile('profile_picture')){
+            $file = $request->file('profile_picture');
+            $filePath = $file->store('profile_pictures', 'public');
         }
 
         $user = User::create([
