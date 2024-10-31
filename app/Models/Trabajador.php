@@ -12,4 +12,13 @@ class Trabajador extends Model
         'longitud',
         'images'
     ];
+
+    //relacion inversa a partir de un trabajador conseguir sus datos de usuario
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function contratos(){
+        return $this->hasMany(Contrato::class);
+    }
 }

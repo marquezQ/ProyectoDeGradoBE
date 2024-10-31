@@ -21,3 +21,5 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 Route::post('/trabajador', [TrabajadorController::class, 'store']);
 Route::get('/trabajador', [TrabajadorController::class, 'index']);
+
+Route::get('/userTrabajador', [AuthController::class, 'isTrabajador']);

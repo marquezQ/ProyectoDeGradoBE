@@ -49,4 +49,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function trabajador(){
+        return $this->hasOne(Trabajador::class);
+    }
+
+    public function contratos(){
+        return $this->hasMany(Contrato::class);
+    }
 }

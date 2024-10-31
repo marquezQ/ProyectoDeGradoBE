@@ -11,7 +11,7 @@ class TrabajadorController extends Controller
     
     public function index()
     {
-        $trabajadors = Trabajador::all();
+        $trabajadors = Trabajador::with('user')->get();
        
         $data = [
             'trabajadors' => $trabajadors,

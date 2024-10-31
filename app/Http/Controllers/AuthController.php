@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Trabajador;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -92,5 +93,12 @@ class AuthController extends Controller
         return [
             'message' => 'You are logged out.' 
         ];
+    }
+
+    public function isTrabajador(Request $request){
+        $user = Trabajador::where('id', 2)
+                ->with('user')
+                ->first();
+        return $user;
     }
 }
