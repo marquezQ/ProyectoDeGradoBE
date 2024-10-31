@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('contratos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('trabajador_id');
-                $table->foreignId('trabajador_id')->nullable()
+                $table->foreign('trabajador_id')->nullable()
                 ->references('id')
                 ->on('trabajadors')
                 ->onDelete('set null'); //no eliminara contratos de trabajadores eliminados, por eso nulleable
             $table->unsignedBigInteger('user_id');
-                $table->foreignId('user_id')->nullable()
+                $table->foreign('user_id')->nullable()
                 ->references('id')
                 ->on('users')
                 ->onDelete('set null');
