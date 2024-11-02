@@ -21,4 +21,8 @@ class Contrato extends Model
     public function trabajador(){
         return $this->belongsTo(Trabajador::class);
     }
+
+    public function reseña(){
+        return $this->hasOne(Reseña::class);
+    }
 }
