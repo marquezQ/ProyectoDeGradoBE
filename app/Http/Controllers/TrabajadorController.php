@@ -24,6 +24,7 @@ class TrabajadorController extends Controller
 {
     $validator = Validator::make($request->all(), [
         'user_id' => 'required|unique:trabajadors',
+        'description' => 'required',
         'latitud' => 'required',
         'longitud' => 'required',
         'imagen1' => 'required|file|image|max:2048',
@@ -50,6 +51,7 @@ class TrabajadorController extends Controller
 
     $trabajador = Trabajador::create([
         'user_id' => $request->user_id,
+        'description' => $request->description,
         'latitud' => $request->latitud,
         'longitud' => $request->longitud,
         'images' => json_encode($imagenesPaths), // Convertir el objeto a JSON

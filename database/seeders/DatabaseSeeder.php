@@ -22,7 +22,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             TrabajadorSeeder::class,
-            ContratoSeeder::class
+            ContratoSeeder::class,
+            ReseniaSeeder::class,
+            CalificacionSeeder::class
         ]);
     }
 }

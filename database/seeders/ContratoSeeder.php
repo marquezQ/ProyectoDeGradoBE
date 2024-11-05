@@ -15,7 +15,7 @@ class ContratoSeeder extends Seeder
     {
         $contrato = new Contrato();
         $contrato->trabajador_id = '1';
-        $contrato->user_id = '1';
+        $contrato->user_id = '6';
         $contrato->start_date = '2024-11-01 10:00:00';
         $contrato->end_date = '2024-11-01 18:00:00';
         $contrato->details = json_encode([

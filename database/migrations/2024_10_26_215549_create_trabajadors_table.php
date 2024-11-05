@@ -19,6 +19,7 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            $table->text('description');
             $table->string('latitud');
             $table->string('longitud');
             $table->json('images');

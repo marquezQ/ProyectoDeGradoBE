@@ -8,6 +8,7 @@ class Trabajador extends Model
 {
     protected $fillable = [
         'user_id',
+        'description',
         'latitud',
         'longitud',
         'images'
