@@ -22,4 +22,8 @@ class Trabajador extends Model
     public function contratos(){
         return $this->hasMany(Contrato::class);
     }
+
+    public function productos(){
+        return $this->hasMany(Producto::class);
+    }
 }
