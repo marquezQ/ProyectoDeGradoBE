@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContratoController;
+use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ReseñaController;
 use App\Http\Controllers\TrabajadorController;
 use Illuminate\Http\Request;
@@ -30,3 +31,7 @@ Route::get('/contrato', [ContratoController::class, 'index']);
 Route::post('/contrato', [ContratoController::class, 'store']);
 
 Route::post('/resenia', [ReseñaController::class, 'store']);
+
+Route::get('/productos', [ProductoController::class, 'index']);
+Route::post('/productos', [ProductoController::class, 'store']);
+Route::get('/productos/{id}', [ProductoController::class, 'productsByTrabajadorId']);
