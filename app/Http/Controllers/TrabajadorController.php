@@ -27,9 +27,11 @@ class TrabajadorController extends Controller
         'description' => 'required',
         'latitud' => 'required',
         'longitud' => 'required',
-        'imagen1' => 'required|file|image|max:2048',
-        'imagen2' => 'required|file|image|max:2048',
-        'imagen3' => 'required|file|image|max:2048',
+        'imagen1' => 'required|file|image|max:20048',
+        'imagen2' => '|file|image|max:20048',
+        'imagen3' => '|file|image|max:20048',
+        'imagen4' => '|file|image|max:20048',
+        'imagen5' => '|file|image|max:20048',
     ]);
 
     if ($validator->fails()) {
@@ -42,7 +44,7 @@ class TrabajadorController extends Controller
 
     // Crear un objeto JSON con claves individuales para cada imagen
     $imagenesPaths = [];
-    foreach (['imagen1', 'imagen2', 'imagen3'] as $index => $imagen) {
+    foreach (['imagen1', 'imagen2', 'imagen3', 'imagen4', 'imagen5'] as $index => $imagen) {
         if ($request->hasFile($imagen)) {
             $path = $request->file($imagen)->store('imagesTrabajador', 'public');
             $imagenesPaths["image" . ($index + 1)] = $path;
@@ -69,5 +71,18 @@ class TrabajadorController extends Controller
         'status' => 201,
     ], 201);
 }
+
+    public function getTrabajador($id){
+        $trabajador = Trabajador::with('user')->find($id);
+        if($trabajador){
+            return response()->json([
+                'trabajador' => $trabajador,
+                'status' => 201,
+            ]);
+        }
+        return response()->json([
+            'message' => 'no existe',
+        ]);
+    }
 
 }

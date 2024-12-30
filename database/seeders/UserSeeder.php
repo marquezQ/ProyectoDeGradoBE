@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
         $user->lastname = 'Alcocer';
         $user->email = "jonas@gmail.com";
         $user->phone_number = '69758696';
-        $user->profile_picture = 'profile_pictures/foto4.jpeg';
+        $user->profile_picture = 'profile_pictures/foto4.jpg';
         $user->password = '123456';
         $user->save();
 

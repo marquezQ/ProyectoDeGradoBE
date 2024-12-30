@@ -24,8 +24,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 Route::post('/trabajador', [TrabajadorController::class, 'store']);
 Route::get('/trabajador', [TrabajadorController::class, 'index']);
+Route::get('/trabajador/{id}', [TrabajadorController::class, 'getTrabajador']);
 
-Route::get('/userTrabajador', [AuthController::class, 'isTrabajador']);
+
+Route::get('/userTrabajador/{id}', [AuthController::class, 'isTrabajador']);
 
 Route::get('/contrato', [ContratoController::class, 'index']);
 Route::post('/contrato', [ContratoController::class, 'store']);

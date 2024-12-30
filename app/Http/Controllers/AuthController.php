@@ -64,7 +64,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users',
+            'email' => 'required|email|',
             'password' => 'required'
         ]);
 
@@ -95,10 +95,15 @@ class AuthController extends Controller
         ];
     }
 
-    public function isTrabajador(Request $request){
-        $user = Trabajador::where('id', 2)
-                ->with('user')
+    public function isTrabajador($id){
+        $trabajador = Trabajador::where('user_id', $id)
+                // ->with('user')
                 ->first();
-        return $user;
+        if($trabajador){
+            return $trabajador;
+        }
+        return [
+            'message' => 'El usuario no existe o no es trabajador'
+        ];
     }
 }
