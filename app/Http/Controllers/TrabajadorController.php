@@ -4,19 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Storage;
 class TrabajadorController extends Controller
 {
-    
-    public function index()
-    {
+
+    public function index(){
         $trabajadors = Trabajador::with('user')->get();
-       
+
+        $trabajadors = $trabajadors->map(function ($trabajador) {
+            // Decodificar las imágenes almacenadas en formato JSON
+            $images = json_decode($trabajador->images, true);
+
+            // Construir las rutas completas para cada imagen
+            if ($images) {
+                $images = array_map(function ($path) {
+                    return asset(Storage::url($path));
+                }, $images);
+            }
+
+            // Agregar las rutas completas de las imágenes al trabajador
+            $trabajador->images = $images;
+
+            // Procesar la imagen de perfil del usuario si existe
+            if ($trabajador->user && $trabajador->user->profile_picture) {
+                $trabajador->user->profile_picture = asset(Storage::url($trabajador->user->profile_picture));
+            }
+
+            return $trabajador;
+        });
+
         $data = [
             'trabajadors' => $trabajadors,
-            'status' => 200
+            'status' => 200,
         ];
+
         return response()->json($data, 200);
     }
 
@@ -74,8 +97,20 @@ class TrabajadorController extends Controller
 
     public function getTrabajador($id){
         $trabajador = Trabajador::with('user')->find($id);
+        
         if($trabajador){
-            return response()->json([
+            $images = json_decode($trabajador->images, true);
+            if($images){
+                $images = array_map(function ($path) {
+                    return asset(Storage::url($path));
+                }, $images);
+            }
+            $trabajador->images = $images;
+
+            if($trabajador->user && $trabajador->user->profile_picture){
+                $trabajador->user->profile_picture = asset(Storage::url($trabajador->user->profile_picture));
+            }
+            return response()->json([   
                 'trabajador' => $trabajador,
                 'status' => 201,
             ]);
