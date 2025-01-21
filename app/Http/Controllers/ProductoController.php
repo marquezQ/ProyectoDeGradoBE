@@ -6,7 +6,7 @@ use App\Models\Producto;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Storage;
 class ProductoController extends Controller
 {
     public function index(){
@@ -18,24 +18,31 @@ class ProductoController extends Controller
         return response()->json($data, 200);
     }
 
-    public function productsByTrabajadorId($id){
-        $trabajador = Trabajador::find($id);
+    public function productsByTrabajadorId($id)
+{
+    $trabajador = Trabajador::find($id);
 
-        if (!$trabajador) {
-            $data = [
-                'error' => 'Trabajador no encontrado',
-                'status' => 404
-            ];
-            return response()->json($data, 404);
-        }
-
-        $productos = $trabajador->productos;
-        $data = [
-            'products' => $productos,
-            'status' => 200
-        ];
-        return response()->json($data, 200);
+    if (!$trabajador) {
+        return response()->json([
+            'error' => 'Trabajador no encontrado',
+            'status' => 404
+        ], 404);
     }
+
+    $productos = $trabajador->productos;
+
+    $productos->transform(function ($producto) {
+        if ($producto->image) { // Cambiar "image" al nombre real de la columna en tu tabla de productos
+            $producto->image = asset(Storage::url($producto->image));
+        }
+        return $producto;
+    });
+
+    return response()->json([
+        'products' => $productos,
+        'status' => 200
+    ], 200);
+}
 
     public function store(Request $request){
         $validator = Validator::make($request->all(), [

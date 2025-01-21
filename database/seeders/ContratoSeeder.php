@@ -22,5 +22,15 @@ class ContratoSeeder extends Seeder
             'aqui'=> 'los detalees'
         ]);
         $contrato->save();
+
+        $contrato = new Contrato();
+        $contrato->trabajador_id = '1';
+        $contrato->user_id = '7';
+        $contrato->start_date = '2024-11-01 10:00:00';
+        $contrato->end_date = '2024-11-01 18:00:00';
+        $contrato->details = json_encode([
+            'aqui'=> 'los detalles222'
+        ]);
+        $contrato->save();
     }
 }

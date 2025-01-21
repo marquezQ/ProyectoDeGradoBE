@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Calificacion;
 use App\Models\Reseña;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ReseñaController extends Controller
@@ -146,4 +148,45 @@ class ReseñaController extends Controller
             ], 500);
         }
     }
+
+    public function getReseniaByTrabajId($id)
+    {
+        // Buscar al trabajador por su ID junto con sus reseñas, calificación e información del usuario
+        $trabajador = Trabajador::with('reseñas.calificacion', 'reseñas.contrato.user')->find($id);
+    
+        // Verificar si el trabajador existe
+        if (!$trabajador) {
+            return response()->json(['message' => 'Trabajador no encontrado'], 404);
+        }
+    
+        // Procesar reseñas para transformar el campo 'images' y 'profile_picture'
+        $reseñas = $trabajador->reseñas->map(function ($reseña) {
+            // Decodificar el JSON del campo 'images'
+            $images = json_decode($reseña->images, true);
+    
+            // Si hay imágenes, transformarlas con asset(Storage::url(...))
+            if ($images && is_array($images)) {
+                foreach ($images as $key => $image) {
+                    $images[$key] = asset(Storage::url($image));
+                }
+                $reseña->images = $images;
+            }
+    
+            // // Transformar la URL de la imagen de perfil del usuario
+            // if ($reseña->contrato && $reseña->contrato->user && $reseña->contrato->user->profile_picture) {
+            if ($reseña->contrato->user->profile_picture) {
+                $reseña->contrato->user->profile_picture = asset(Storage::url($reseña->contrato->user->profile_picture));
+            }
+
+            return $reseña;
+        });
+        // Retornar las reseñas del trabajador con las imágenes transformadas
+        return response()->json([
+            'reseñas' => $reseñas,
+            'status' => 200
+        ], 200);
+        
+    }
+    
+
 }

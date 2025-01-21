@@ -33,6 +33,7 @@ Route::get('/contrato', [ContratoController::class, 'index']);
 Route::post('/contrato', [ContratoController::class, 'store']);
 
 Route::post('/resenia', [ReseñaController::class, 'store']);
+Route::get('/resenia/{id}', [ReseñaController::class, 'getReseniaByTrabajId']);
 
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::post('/productos', [ProductoController::class, 'store']);
