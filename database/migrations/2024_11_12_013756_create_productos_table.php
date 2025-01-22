@@ -18,6 +18,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('trabajadors')
                 ->onDelete('cascade');
+            $table->string('name');
             $table->integer('stock');
             $table->decimal('price');
             $table->string('image');

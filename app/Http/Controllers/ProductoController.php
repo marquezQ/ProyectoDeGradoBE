@@ -47,6 +47,7 @@ class ProductoController extends Controller
     public function store(Request $request){
         $validator = Validator::make($request->all(), [
             'trabajador_id' => 'required',
+            'name' => 'required',
             'stock' => 'required',
             'price' => 'required',
             'image' => 'required|file'
@@ -66,6 +67,7 @@ class ProductoController extends Controller
         }
         $product = Producto::create([
             'trabajador_id' => $request->trabajador_id,
+            'name' => $request->name,
             'stock' => $request->stock,
             'price' => $request->price,
             'image' => $filePath
