@@ -17,6 +17,8 @@ class ContratoController extends Controller
         $validator = Validator::make($request->all(), [
             'trabajador_id' => 'required',
             'user_id' => 'required',
+            'title' => 'required',
+            'status' => 'required|in:pendiente,aceptado,rechazado',
             'start_date' => 'required',
             'end_date' => 'required',
             'details' => 'required|array'
@@ -33,6 +35,8 @@ class ContratoController extends Controller
         $contrato = Contrato::create([
             'trabajador_id' => $request->trabajador_id,
             'user_id' => $request->user_id,
+            'title' => $request->title,
+            'status' => $request->status,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'details' => json_encode($request->details)

@@ -16,6 +16,8 @@ class ContratoSeeder extends Seeder
         $contrato = new Contrato();
         $contrato->trabajador_id = '1';
         $contrato->user_id = '6';
+        $contrato->title = 'el mejor titulo 111';
+        $contrato->status = 'pendiente';
         $contrato->start_date = '2024-11-01 10:00:00';
         $contrato->end_date = '2024-11-01 18:00:00';
         $contrato->details = json_encode([
@@ -26,6 +28,8 @@ class ContratoSeeder extends Seeder
         $contrato = new Contrato();
         $contrato->trabajador_id = '1';
         $contrato->user_id = '7';
+        $contrato->title = 'el mejor titulo 222';
+        $contrato->status = 'aceptado';
         $contrato->start_date = '2024-11-01 10:00:00';
         $contrato->end_date = '2024-11-01 18:00:00';
         $contrato->details = json_encode([

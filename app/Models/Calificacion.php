@@ -15,6 +15,10 @@ class Calificacion extends Model
         'final'
     ];
 
+    protected $casts = [
+        'final' => 'float',
+    ];
+
     public function reseña(){
         return $this->belongsTo(Reseña::class);
     }

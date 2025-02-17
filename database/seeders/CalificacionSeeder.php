@@ -23,5 +23,14 @@ class CalificacionSeeder extends Seeder
          
         $calificacion->save();
 
+        $calificacion = new Calificacion();
+        $calificacion->reseña_id = '2';
+        $calificacion->time = 5;
+        $calificacion->quality = 5;
+        $calificacion->communication = 5;
+        $calificacion->price = 1;
+        $calificacion->final = 4.0;
+         
+        $calificacion->save();
     }
 }

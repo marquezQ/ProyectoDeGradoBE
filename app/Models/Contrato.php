@@ -9,6 +9,8 @@ class Contrato extends Model
     protected $fillable = [
         'trabajador_id',
         'user_id',
+        'title',
+        'status',
         'start_date',
         'end_date',
         'details',

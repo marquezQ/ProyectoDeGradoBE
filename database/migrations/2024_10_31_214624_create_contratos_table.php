@@ -23,6 +23,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('set null');
+            $table->string('title');
+            $table->string('status');
             $table->timestamp('start_date');
             $table->timestamp('end_date');
             $table->json('details');
