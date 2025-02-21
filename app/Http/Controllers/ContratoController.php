@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contrato;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -53,5 +54,60 @@ class ContratoController extends Controller
             'Contrato' => $contrato,
             'status' => 201,
         ], 201);
+    }
+    public function getContratosByTrabajadorAndCliente($trabajador_id, $cliente_id){
+        $contratos = Contrato::with([
+            // Para el cliente (modelo User) obtenemos solo los campos deseados
+            'user' => function ($query) {
+                $query->select('id', 'name', 'lastname', 'phone_number');
+            },
+            // Para el trabajador, obtenemos únicamente latitud, longitud y description, además de user_id (para la relación)
+            'trabajador' => function ($query) {
+                $query->select('id', 'user_id', 'latitud', 'longitud', 'description');
+            },
+            // Y de la información del usuario asociado al trabajador, también limitamos los campos
+            'trabajador.user' => function ($query) {
+                $query->select('id', 'name', 'lastname', 'phone_number');
+            }
+        ])
+            ->where('trabajador_id', $trabajador_id)
+            ->where('user_id', $cliente_id)
+            ->get();
+
+        return response()->json([
+            'contratos' => $contratos,
+            'status' => 200,
+        ], 200);
+    }
+
+    public function getContratosByTrabajador($trabajador_id){
+        $trabajador = Trabajador::find($trabajador_id);
+        if (!$trabajador) {
+            return response()->json([
+                'message' => 'El trabajador no existe',
+                'status'  => 404,
+            ], 404);
+        }
+        $contratos = Contrato::with([
+            // Carga del cliente (modelo User) con la información requerida
+            'user' => function ($query) {
+                $query->select('id', 'name', 'lastname', 'phone_number');
+            },
+            // Carga del trabajador con sus campos específicos y el user_id para la relación
+            'trabajador' => function ($query) {
+                $query->select('id', 'user_id', 'latitud', 'longitud', 'description');
+            },
+            // Carga de la información del usuario asociado al trabajador
+            'trabajador.user' => function ($query) {
+                $query->select('id', 'name', 'lastname', 'phone_number');
+            }
+        ])
+        ->where('trabajador_id', $trabajador_id)
+        ->get();
+
+        return response()->json([
+            'contratos' => $contratos,
+            'status' => 200,
+        ], 200);
     }
 }

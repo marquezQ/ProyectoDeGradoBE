@@ -31,6 +31,9 @@ Route::get('/userTrabajador/{id}', [AuthController::class, 'isTrabajador']);
 
 Route::get('/contrato', [ContratoController::class, 'index']);
 Route::post('/contrato', [ContratoController::class, 'store']);
+Route::get('/contrato/{trabajador_id}/{cliente_id}', [ContratoController::class, 'getContratosByTrabajadorAndCliente']);
+Route::get('/contrato/{trabajador_id}', [ContratoController::class, 'getContratosByTrabajador']);
+
 
 Route::post('/resenia', [ReseñaController::class, 'store']);
 Route::get('/resenia/{id}', [ReseñaController::class, 'getReseniaByTrabajId']);
