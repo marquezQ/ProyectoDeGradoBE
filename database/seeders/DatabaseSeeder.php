@@ -24,7 +24,8 @@ class DatabaseSeeder extends Seeder
             TrabajadorSeeder::class,
             ContratoSeeder::class,
             ReseniaSeeder::class,
-            CalificacionSeeder::class
+            CalificacionSeeder::class,
+            ProductoSeeder::class
         ]);
     }
 }

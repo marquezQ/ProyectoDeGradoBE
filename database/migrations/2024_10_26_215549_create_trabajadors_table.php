@@ -20,8 +20,10 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->text('description');
+            $table->string('workshop');
             $table->string('latitud');
             $table->string('longitud');
+            $table->string('address')->nullable();
             $table->json('images');
             $table->timestamps();
         });

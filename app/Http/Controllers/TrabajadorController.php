@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 class TrabajadorController extends Controller
 {
 
@@ -48,8 +48,10 @@ class TrabajadorController extends Controller
     $validator = Validator::make($request->all(), [
         'user_id' => 'required|unique:trabajadors',
         'description' => 'required',
+        'workshop' => 'required',
         'latitud' => 'required',
         'longitud' => 'required',
+        'address' => 'nullable|string',
         'imagen1' => 'required|file|image|max:20048',
         'imagen2' => '|file|image|max:20048',
         'imagen3' => '|file|image|max:20048',
@@ -64,6 +66,7 @@ class TrabajadorController extends Controller
             'status' => 400,
         ], 400);
     }
+    $addressLiteral = $request->address ?? $this->getAddress($request->latitud, $request->longitud);
 
     // Crear un objeto JSON con claves individuales para cada imagen
     $imagenesPaths = [];
@@ -77,8 +80,10 @@ class TrabajadorController extends Controller
     $trabajador = Trabajador::create([
         'user_id' => $request->user_id,
         'description' => $request->description,
+        'workshop' => $request->workshop,
         'latitud' => $request->latitud,
         'longitud' => $request->longitud,
+        'address' => $addressLiteral,
         'images' => json_encode($imagenesPaths), // Convertir el objeto a JSON
     ]);
 
@@ -93,6 +98,29 @@ class TrabajadorController extends Controller
         'trabajador' => $trabajador,
         'status' => 201,
     ], 201);
+}
+private function getAddress(float $lat, float $lng): string
+{
+    $response = Http::withHeaders([
+        'User-Agent' => 'MiAplicacion/1.0 (contacto@ejemplo.com)'
+    ])->get("https://nominatim.openstreetmap.org/reverse", [
+        'lat' => $lat,
+        'lon' => $lng,
+        'format' => 'json'
+    ]);
+
+    if ($response->failed()) {
+        return 'Ubicación desconocida';
+    }
+
+    $data = $response->json();
+    $fullAddress = $data['display_name'] ?? 'Ubicación desconocida';
+
+    // Dividir la dirección en partes separadas por coma
+    $parts = explode(',', $fullAddress);
+
+    // Tomar solo los primeros tres segmentos y unirlos de nuevo
+    return count($parts) >= 3 ? implode(',', array_slice($parts, 0, 3)) : $fullAddress;
 }
 
     public function getTrabajador($id){
