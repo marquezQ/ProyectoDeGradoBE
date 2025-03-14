@@ -87,4 +87,56 @@ class ProductoController extends Controller
         ];
         return response()->json($data, 200);
     }
+
+    public function update(Request $request, $id)
+    {
+    $product = Producto::find($id);
+
+    if (!$product) {
+        return response()->json([
+            'message' => 'Producto no encontrado',
+            'status' => 404
+        ], 404);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'trabajador_id' => 'required',
+        'name' => 'required',
+        'stock' => 'required',
+        'price' => 'required',
+        'image' => 'nullable|file'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Error en la validación de datos',
+            'errors' => $validator->errors(),
+            'status' => 400
+        ], 400);
+    }
+
+    $product->trabajador_id = $request->trabajador_id;
+    $product->name = $request->name;
+    $product->stock = $request->stock;
+    $product->price = $request->price;
+
+    if ($request->hasFile('image')) {
+        // Eliminar la imagen anterior si existe
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+        // Guardar la nueva imagen
+        $filePath = $request->file('image')->store('products', 'public');
+        $product->image = $filePath;
+    }
+
+    $product->save();
+
+    return response()->json([
+        'message' => 'Producto actualizado correctamente',
+        'product' => $product,
+        'status' => 200
+    ], 200);
+}
+
 }

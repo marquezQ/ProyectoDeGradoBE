@@ -41,3 +41,4 @@ Route::get('/resenia/{id}', [ReseñaController::class, 'getReseniaByTrabajId']);
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::post('/productos', [ProductoController::class, 'store']);
 Route::get('/productos/{id}', [ProductoController::class, 'productsByTrabajadorId']);
+Route::put('/productos/{id}', [ProductoController::class, 'update']);
