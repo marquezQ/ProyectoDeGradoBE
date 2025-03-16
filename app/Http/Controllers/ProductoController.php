@@ -138,5 +138,27 @@ class ProductoController extends Controller
         'status' => 200
     ], 200);
 }
+    public function destroy($id)
+    {
+    $product = Producto::find($id);
+
+    if (!$product) {
+        return response()->json([
+            'message' => 'Producto no encontrado',
+            'status' => 404
+        ], 404);
+    }
+
+    if ($product->image) {
+        Storage::disk('public')->delete($product->image);
+    }
+
+    $product->delete();
+
+    return response()->json([
+        'message' => 'Producto eliminado correctamente',
+        'status' => 200
+    ], 200);
+    }
 
 }
