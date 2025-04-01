@@ -19,7 +19,7 @@ class CalificacionSeeder extends Seeder
         $calificacion->quality = 2;
         $calificacion->communication = 2;
         $calificacion->price = 2;
-        $calificacion->final = 2.0;
+        $calificacion->final = 5.0;
          
         $calificacion->save();
 
@@ -29,7 +29,7 @@ class CalificacionSeeder extends Seeder
         $calificacion->quality = 5;
         $calificacion->communication = 5;
         $calificacion->price = 1;
-        $calificacion->final = 4.0;
+        $calificacion->final = 2.5;
          
         $calificacion->save();
     }

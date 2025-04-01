@@ -9,39 +9,47 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 class TrabajadorController extends Controller
 {
+    public function index()
+    {
+    $trabajadors = Trabajador::with('user')->get();
 
-    public function index(){
-        $trabajadors = Trabajador::with('user')->get();
+    $trabajadors = $trabajadors->map(function ($trabajador) {
+        // Decodificar las imágenes almacenadas en formato JSON
+        $images = json_decode($trabajador->images, true);
 
-        $trabajadors = $trabajadors->map(function ($trabajador) {
-            // Decodificar las imágenes almacenadas en formato JSON
-            $images = json_decode($trabajador->images, true);
+        // Construir las rutas completas para cada imagen
+        if ($images) {
+            $images = array_map(fn($path) => asset(Storage::url($path)), $images);
+        }
+        $trabajador->images = $images;
 
-            // Construir las rutas completas para cada imagen
-            if ($images) {
-                $images = array_map(function ($path) {
-                    return asset(Storage::url($path));
-                }, $images);
-            }
+        // Procesar la imagen de perfil del usuario si existe
+        if ($trabajador->user && $trabajador->user->profile_picture) {
+            $trabajador->user->profile_picture = asset(Storage::url($trabajador->user->profile_picture));
+        }
 
-            // Agregar las rutas completas de las imágenes al trabajador
-            $trabajador->images = $images;
+        // Contar total de reseñas (cantidad de contratos que tienen reseña)
+        $totalReviews = $trabajador->contratos()->has('reseña')->count();
 
-            // Procesar la imagen de perfil del usuario si existe
-            if ($trabajador->user && $trabajador->user->profile_picture) {
-                $trabajador->user->profile_picture = asset(Storage::url($trabajador->user->profile_picture));
-            }
+        // Calcular promedio de calificaciones
+        $averageRating = $trabajador->contratos()
+            ->join('reseñas', 'contratos.id', '=', 'reseñas.contrato_id')
+            ->join('calificacions', 'reseñas.id', '=', 'calificacions.reseña_id')
+            ->avg('calificacions.final');
 
-            return $trabajador;
-        });
+        $trabajador->totalReviews = $totalReviews;
+        $trabajador->averageRating = round($averageRating, 2);
 
-        $data = [
-            'trabajadors' => $trabajadors,
-            'status' => 200,
-        ];
+        return $trabajador;
+    });
 
-        return response()->json($data, 200);
-    }
+    $data = [
+        'trabajadors' => $trabajadors,
+        'status' => 200,
+    ];
+
+    return response()->json($data, 200);
+}
 
     public function store(Request $request)
 {
@@ -138,6 +146,15 @@ private function getAddress(float $lat, float $lng): string
             if($trabajador->user && $trabajador->user->profile_picture){
                 $trabajador->user->profile_picture = asset(Storage::url($trabajador->user->profile_picture));
             }
+            $totalReviews = $trabajador->contratos()->has('reseña')->count();
+            // Calcular promedio de calificaciones
+            $averageRating = $trabajador->contratos()
+                ->join('reseñas', 'contratos.id', '=', 'reseñas.contrato_id')
+                ->join('calificacions', 'reseñas.id', '=', 'calificacions.reseña_id')
+                ->avg('calificacions.final');
+            $trabajador->totalReviews = $totalReviews;
+            $trabajador->averageRating = round($averageRating, 2);
+            
             return response()->json([   
                 'trabajador' => $trabajador,
                 'status' => 201,
