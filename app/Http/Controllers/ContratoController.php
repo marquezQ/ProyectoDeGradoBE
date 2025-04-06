@@ -51,7 +51,7 @@ class ContratoController extends Controller
         }
 
         return response()->json([
-            'Contrato' => $contrato,
+            'contrato' => $contrato,
             'status' => 201,
         ], 201);
     }
@@ -72,6 +72,7 @@ class ContratoController extends Controller
         ])
             ->where('trabajador_id', $trabajador_id)
             ->where('user_id', $cliente_id)
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json([
@@ -103,6 +104,7 @@ class ContratoController extends Controller
             }
         ])
         ->where('trabajador_id', $trabajador_id)
+        ->orderBy('created_at', 'desc')
         ->get();
 
         return response()->json([
