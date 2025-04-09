@@ -59,15 +59,15 @@ class ContratoController extends Controller
         $contratos = Contrato::with([
             // Para el cliente (modelo User) obtenemos solo los campos deseados
             'user' => function ($query) {
-                $query->select('id', 'name', 'lastname', 'phone_number');
+                $query->select('id', 'name', 'lastname', 'phone_number', 'email');
             },
             // Para el trabajador, obtenemos únicamente latitud, longitud y description, además de user_id (para la relación)
             'trabajador' => function ($query) {
-                $query->select('id', 'user_id', 'latitud', 'longitud', 'description');
+                $query->select('id', 'user_id', 'latitud', 'longitud', 'description', 'address', 'workshop');
             },
             // Y de la información del usuario asociado al trabajador, también limitamos los campos
             'trabajador.user' => function ($query) {
-                $query->select('id', 'name', 'lastname', 'phone_number');
+                $query->select('id', 'name', 'lastname', 'phone_number', 'email');
             }
         ])
             ->where('trabajador_id', $trabajador_id)
