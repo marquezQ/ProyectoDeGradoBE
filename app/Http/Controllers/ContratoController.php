@@ -55,6 +55,83 @@ class ContratoController extends Controller
             'status' => 201,
         ], 201);
     }
+    public function update(Request $request, $id)
+    {
+    $contrato = Contrato::find($id);
+
+    if (!$contrato) {
+        return response()->json([
+            'message' => 'Producto no encontrado',
+            'status' => 404
+        ], 404);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'trabajador_id' => 'required',
+        'user_id' => 'required',
+        'title' => 'required',
+        'status' => 'required|in:pendiente,aceptado,rechazado',
+        'start_date' => 'required',
+        'end_date' => 'required',
+        'details' => 'required|array'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Error en la validación de datos',
+            'errors' => $validator->errors(),
+            'status' => 400
+        ], 400);
+    }
+
+    $contrato->trabajador_id = $request->trabajador_id;
+    $contrato->user_id = $request->user_id;
+    $contrato->title = $request->title;
+    $contrato->status = $request->status;
+    $contrato->start_date = $request->start_date;
+    $contrato->end_date = $request->end_date;
+    $contrato->details = json_encode($request->details, JSON_UNESCAPED_UNICODE);
+
+    $contrato->save();
+
+    return response()->json([
+        'contrato' => $contrato,
+        'status' => 200
+    ], 200);
+}
+
+    public function updatePartial(Request $request, $id)
+    {
+        $contrato = Contrato::find($id);
+
+        if (!$contrato) {
+            return response()->json([
+                'message' => 'Contrato no encontrado',
+                'status' => 404
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:pendiente,aceptado,rechazado'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ], 400);
+        }
+
+        $contrato->status = $request->status;
+        $contrato->save();
+
+        return response()->json([
+            'contract' => $contrato,
+            'status' => 200
+        ], 200);
+    }
+
     public function getContratosByTrabajadorAndCliente($trabajador_id, $cliente_id){
         $contratos = Contrato::with([
             // Para el cliente (modelo User) obtenemos solo los campos deseados

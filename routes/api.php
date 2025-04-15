@@ -5,6 +5,7 @@ use App\Http\Controllers\ContratoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ReseñaController;
 use App\Http\Controllers\TrabajadorController;
+use App\Models\Contrato;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,7 +34,8 @@ Route::get('/contrato', [ContratoController::class, 'index']);
 Route::post('/contrato', [ContratoController::class, 'store']);
 Route::get('/contrato/{trabajador_id}/{cliente_id}', [ContratoController::class, 'getContratosByTrabajadorAndCliente']);
 Route::get('/contrato/{trabajador_id}', [ContratoController::class, 'getContratosByTrabajador']);
-
+Route::put('/contrato/{id}', [ContratoController::class, 'update']);
+Route::patch('/contrato/{id}/status', [ContratoController::class, 'updatePartial']);
 
 Route::post('/resenia', [ReseñaController::class, 'store']);
 Route::get('/resenia/{id}', [ReseñaController::class, 'getReseniaByTrabajId']);
