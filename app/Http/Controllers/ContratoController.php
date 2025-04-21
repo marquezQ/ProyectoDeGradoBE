@@ -70,7 +70,7 @@ class ContratoController extends Controller
         'trabajador_id' => 'required',
         'user_id' => 'required',
         'title' => 'required',
-        'status' => 'required|in:pendiente,aceptado,rechazado',
+        'status' => 'required|in:pendiente,aceptado,rechazado,finalizado',
         'start_date' => 'required',
         'end_date' => 'required',
         'details' => 'required|array'
@@ -112,7 +112,7 @@ class ContratoController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:pendiente,aceptado,rechazado'
+            'status' => 'required|in:pendiente,aceptado,rechazado,finalizado'
         ]);
 
         if ($validator->fails()) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Calificacion;
+use App\Models\Contrato;
 use App\Models\Reseña;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
@@ -132,6 +133,13 @@ class ReseñaController extends Controller
                 'final' => array_sum([$request->time, $request->quality, $request->communication, $request->price]) / 4,
             ]);
 
+            //  Actualiza el estado del contrato
+            $contrato = Contrato::find($request->contrato_id);
+            if ($contrato) {
+                $contrato->status = 'finalizado';
+                $contrato->save();
+            }
+            
             DB::commit();
 
             return response()->json([

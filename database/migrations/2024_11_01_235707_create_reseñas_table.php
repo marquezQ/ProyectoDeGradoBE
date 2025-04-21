@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reseñas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('contrato_id');
+            $table->unsignedBigInteger('contrato_id')->unique();
                 $table->foreign('contrato_id')
                 ->references('id')
                 ->on('contratos')
