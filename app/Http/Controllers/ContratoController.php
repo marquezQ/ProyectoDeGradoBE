@@ -189,4 +189,23 @@ class ContratoController extends Controller
             'status' => 200,
         ], 200);
     }
+
+    public function destroy($id)
+    {
+    $contract = Contrato::find($id);
+
+    if (!$contract) {
+        return response()->json([
+            'message' => 'contrato no encontrado',
+            'status' => 404
+        ], 404);
+    }
+
+    $contract->delete();
+
+    return response()->json([
+        'message' => 'Contrato eliminado correctamente',
+        'status' => 200
+    ], 200);
+    }
 }

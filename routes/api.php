@@ -36,6 +36,7 @@ Route::get('/contrato/{trabajador_id}/{cliente_id}', [ContratoController::class,
 Route::get('/contrato/{trabajador_id}', [ContratoController::class, 'getContratosByTrabajador']);
 Route::put('/contrato/{id}', [ContratoController::class, 'update']);
 Route::patch('/contrato/{id}/status', [ContratoController::class, 'updatePartial']);
+Route::delete('/contrato/{id}', [ContratoController::class, 'destroy']);
 
 Route::post('/resenia', [ReseñaController::class, 'store']);
 Route::get('/resenia/{id}', [ReseñaController::class, 'getReseniaByTrabajId']);
