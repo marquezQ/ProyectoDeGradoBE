@@ -60,11 +60,11 @@ class TrabajadorController extends Controller
         'latitud' => 'required',
         'longitud' => 'required',
         'address' => 'nullable|string',
-        'imagen1' => 'required|file|image|max:20048',
-        'imagen2' => '|file|image|max:20048',
-        'imagen3' => '|file|image|max:20048',
-        'imagen4' => '|file|image|max:20048',
-        'imagen5' => '|file|image|max:20048',
+        'imagen1' => 'required|file|image|max:30720',
+        'imagen2' => '|file|image|max:30720',
+        'imagen3' => '|file|image|max:30720',
+        'imagen4' => '|file|image|max:30720',
+        'imagen5' => '|file|image|max:30720',
     ]);
 
     if ($validator->fails()) {

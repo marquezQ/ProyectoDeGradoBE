@@ -87,9 +87,9 @@ class ReseñaController extends Controller
             'contrato_id' => 'required',
             'comment' => 'required',
             'recommend' => 'required|boolean',
-            'imagen1' => 'required|file|image|max:20048',
-            'imagen2' => 'file|image|max:20048',
-            'imagen3' => 'file|image|max:20048',
+            'imagen1' => 'required|file|image|max:51200',
+            'imagen2' => 'file|image|max:51200',
+            'imagen3' => 'file|image|max:51200',
             // Campos de calificación
             'time' => 'required|integer|between:1,5',
             'quality' => 'required|integer|between:1,5',
