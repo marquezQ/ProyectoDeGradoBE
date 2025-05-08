@@ -17,7 +17,7 @@ class AuthController extends Controller
             'lastname' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'phone_number' => 'required|max:255',
-            'profile_picture' => 'image|mimes:jpg,jpeg,png|max:20480', // máx. 20MB
+            'profile_picture' => 'image|mimes:jpg,jpeg,png,webp|max:20480', // máx. 20MB
             'password' => 'required'
         ]);
 

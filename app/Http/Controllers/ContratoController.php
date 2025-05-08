@@ -173,11 +173,11 @@ class ContratoController extends Controller
             },
             // Carga del trabajador con sus campos específicos y el user_id para la relación
             'trabajador' => function ($query) {
-                $query->select('id', 'user_id', 'latitud', 'longitud', 'description');
+                $query->select('id', 'user_id', 'latitud', 'longitud', 'description', 'address', 'workshop');
             },
             // Carga de la información del usuario asociado al trabajador
             'trabajador.user' => function ($query) {
-                $query->select('id', 'name', 'lastname', 'phone_number');
+                $query->select('id', 'name', 'lastname', 'phone_number', 'email');
             }
         ])
         ->where('trabajador_id', $trabajador_id)

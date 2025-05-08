@@ -26,7 +26,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::post('/trabajador', [TrabajadorController::class, 'store']);
 Route::get('/trabajador', [TrabajadorController::class, 'index']);
 Route::get('/trabajador/{id}', [TrabajadorController::class, 'getTrabajador']);
-
+Route::patch('/trabajador/{id}/info', [TrabajadorController::class, 'updateInfo']);
+Route::patch('/trabajador/{id}/images', [TrabajadorController::class, 'updateImages']);
 
 Route::get('/userTrabajador/{id}', [AuthController::class, 'isTrabajador']);
 

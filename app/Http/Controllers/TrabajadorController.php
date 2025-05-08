@@ -165,4 +165,48 @@ private function getAddress(float $lat, float $lng): string
         ]);
     }
 
+    public function updateInfo(Request $request, $id)
+    {
+    $trabajador = Trabajador::find($id);
+
+    if (!$trabajador) {
+        return response()->json([
+            'message' => 'Trabajador no encontrado',
+            'status' => 404,
+        ], 404);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'description' => 'required|string',
+        'workshop' => 'required|string',
+        'latitud' => 'required|numeric',
+        'longitud' => 'required|numeric',
+        'address' => 'nullable|string',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Error en la validación',
+            'errors' => $validator->errors(),
+            'status' => 400,
+        ], 400);
+    }
+
+    $trabajador->description = $request->description;
+    $trabajador->workshop = $request->workshop;
+    $trabajador->latitud = $request->latitud;
+    $trabajador->longitud = $request->longitud;
+    $trabajador->address = $request->address ?? $this->getAddress($request->latitud, $request->longitud);
+
+    $trabajador->save();
+
+    return response()->json([
+        'message' => 'Información actualizada correctamente',
+        'trabajador' => $trabajador,
+        'status' => 200,
+    ]);
+}
+
+
+
 }
