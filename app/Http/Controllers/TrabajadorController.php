@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 class TrabajadorController extends Controller
 {
     public function index()
@@ -207,6 +208,64 @@ private function getAddress(float $lat, float $lng): string
     ]);
 }
 
+public function updateImages(Request $request, $id)
+{
+    $trabajador = Trabajador::findOrFail($id);
+
+    $validator = Validator::make($request->all(), [
+        'image1' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:30720',
+        'image2' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:30720',
+        'image3' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:30720',
+        'image4' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:30720',
+        'image5' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:30720',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Error en la validación de imágenes',
+            'errors' => $validator->errors(),
+            'status' => 400,
+        ], 400);
+    }
+
+    $existingImages = json_decode($trabajador->images, true) ?? [
+        'image1' => null,
+        'image2' => null,
+        'image3' => null,
+        'image4' => null,
+        'image5' => null,
+    ];
+
+    foreach (['image1', 'image2', 'image3', 'image4', 'image5'] as $key) {
+        if ($request->hasFile($key)) {
+            // Log::info("Recibido archivo para $key");
+            // Eliminar imagen anterior si existe
+            if (!empty($existingImages[$key])) {
+                Storage::disk('public')->delete($existingImages[$key]);
+            }
+
+            // Guardar nueva imagen
+            $path = $request->file($key)->store('imagesTrabajador', 'public');
+            $existingImages[$key] = $path;
+        }else{
+            // Log::info("NO recibido archivo para $key");
+        }
+    }
+
+    $trabajador->images = json_encode($existingImages);
+    $trabajador->save();
+
+    // Generar URLs completas para la respuesta
+    $imagesWithUrls = collect($existingImages)->map(function ($path) {
+        return $path ? asset(Storage::url($path)) : null;
+    })->toArray();
+
+    return response()->json([
+        'message' => 'Imágenes actualizadas correctamente',
+        'images' => $imagesWithUrls,
+        'status' => 200,
+    ], 200);
+}
 
 
 }
