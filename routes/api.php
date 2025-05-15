@@ -18,6 +18,7 @@ Route::get('/ping', function(Request $request){
 });
 
 
+Route::get(('/user/{id}'), [AuthController::class, 'getUser']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 

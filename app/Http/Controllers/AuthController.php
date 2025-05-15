@@ -6,6 +6,7 @@ use App\Models\Trabajador;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -106,4 +107,37 @@ class AuthController extends Controller
             'message' => 'El usuario no existe o no es trabajador'
         ];
     }
+    public function getUser($user_id)
+    {
+        $usuario = User::find($user_id);
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+        $usuario->profile_picture = $usuario->profile_picture
+            ? asset(Storage::url($usuario->profile_picture))
+            : null;
+
+       
+        $trabajador = Trabajador::where('user_id', $user_id)->first();
+        if ($trabajador) {
+            // Cargamos la relación *una vez* y después mutamos el campo
+            $trabajador->load('user');
+            $trabajador->user->profile_picture = $usuario->profile_picture;
+
+            return response()->json([
+                'datos' => $trabajador
+            ], 200);
+        }
+        //creamos un objeto que contenta user para adeacuerdos al type del front
+        $res = [
+            'user' => $usuario,
+        ];
+        // Si no hay trabajador, devolvemos el usuario formateado
+        return response()->json([
+            'datos' => $res
+        ], 200);
+    }
+
+
+
 }
