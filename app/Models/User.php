@@ -57,4 +57,15 @@ class User extends Authenticatable
     public function contratos(){
         return $this->hasMany(Contrato::class);
     }
+    public function reseñas()
+    {
+        return $this->hasManyThrough(
+            Reseña::class, //modelo final al que queremos llegar (reseñas)
+            Contrato::class,// modelo intermedio (contratos)
+            'user_id',      // clave foránea en la tabla intermedia (contratos) que apunta a users
+            'contrato_id',  // clave foránea en la tabla destino (reseñas) que apunta a contratos
+            'id',           // clave primaria en la tabla origen (users)
+            'id'            // clave primaria en la tabla intermedia (contratos)
+        )->with(['calificacion', 'contrato.trabajador.user']);
+    }
 }

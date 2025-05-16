@@ -42,6 +42,7 @@ Route::delete('/contrato/{id}', [ContratoController::class, 'destroy']);
 
 Route::post('/resenia', [ReseñaController::class, 'store']);
 Route::get('/resenia/{id}', [ReseñaController::class, 'getReseniaByTrabajId']);
+Route::get('/resenia/user/{id}', [ReseñaController::class, 'getReseniaByUserId']);
 
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::post('/productos', [ProductoController::class, 'store']);

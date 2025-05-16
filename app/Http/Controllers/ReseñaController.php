@@ -6,6 +6,7 @@ use App\Models\Calificacion;
 use App\Models\Contrato;
 use App\Models\Reseña;
 use App\Models\Trabajador;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -196,5 +197,49 @@ class ReseñaController extends Controller
         
     }
     
+
+public function getReseniaByUserId($userId)
+{
+    $usuario = User::find($userId);
+    if (!$usuario) {
+        return response()->json([
+            'message' => 'Usuario no encontrado',
+            'status' => 404
+        ], 404);
+    }
+
+    $reseñas = $usuario->reseñas;
+
+    // Formatear imágenes y datos relacionados
+    $reseñas = $reseñas->map(function ($reseña) {
+        $images = json_decode($reseña->images, true);
+        if ($images && is_array($images)) {
+            foreach ($images as $key => $image) {
+                $images[$key] = asset(Storage::url($image));
+            }
+            $reseña->images = $images;
+        }
+
+        // Formatear datos relevantes del contrato y trabajador
+        if ($reseña->contrato && $reseña->contrato->trabajador) {
+            $profile = $reseña->contrato->trabajador->user->profile_picture;
+            if ($profile && !str_starts_with($profile, 'http')) {
+                $reseña->contrato->trabajador->user->profile_picture = asset(Storage::url($profile));
+            }
+        }
+        if ($reseña->contrato && $reseña->contrato->user) {
+            $reseña->contrato->user->profile_picture = $reseña->contrato->user->profile_picture
+                ? asset(Storage::url($reseña->contrato->user->profile_picture))
+                : null;
+        }
+
+        return $reseña;
+    });
+
+    return response()->json([
+        'reseñas' => $reseñas,
+        'status' => 200
+    ], 200);
+}
 
 }
