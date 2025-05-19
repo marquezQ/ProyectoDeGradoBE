@@ -137,7 +137,69 @@ class AuthController extends Controller
             'datos' => $res
         ], 200);
     }
+    
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json([
+                'message' => 'Usuario no encontrado',
+                'status' => 404
+            ], 404);
+        }
 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'lastname' => 'required|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'phone_number' => 'required|max:255',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:20480'
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ], 400);
+        }
 
+        $user->name = $request->name;
+        $user->lastname = $request->lastname;
+        $user->email = $request->email;
+        $user->phone_number = $request->phone_number;
+
+        // Eliminar imagen si se solicita
+        if ($request->has('remove_profile_picture') && $request->remove_profile_picture == "1") {
+            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            $user->profile_picture = null;
+        }
+
+        // Subir nueva imagen si se envía
+        if ($request->hasFile('profile_picture')) {
+            // Eliminar imagen anterior si existe
+            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            // Guardar nueva imagen
+            $file = $request->file('profile_picture');
+            $filePath = $file->store('profile_pictures', 'public');
+            $user->profile_picture = $filePath;
+        }
+
+        $user->save();
+
+        // Formatear la imagen para la respuesta
+        $user->profile_picture = $user->profile_picture
+            ? asset(Storage::url($user->profile_picture))
+            : null;
+
+        return response()->json([
+            'message' => 'Usuario actualizado correctamente',
+            'user' => $user,
+            'status' => 200
+        ], 200);
+    }
 }
