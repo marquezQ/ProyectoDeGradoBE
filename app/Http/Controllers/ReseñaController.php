@@ -180,11 +180,13 @@ class ReseñaController extends Controller
                 }
                 $reseña->images = $images;
             }
-    
-            // // Transformar la URL de la imagen de perfil del usuario
-            // if ($reseña->contrato && $reseña->contrato->user && $reseña->contrato->user->profile_picture) {
-            if ($reseña->contrato->user->profile_picture) {
-                $reseña->contrato->user->profile_picture = asset(Storage::url($reseña->contrato->user->profile_picture));
+
+            // Transformar la URL de la imagen de perfil del usuario solo si no está formateada
+            if ($reseña->contrato && $reseña->contrato->user && $reseña->contrato->user->profile_picture) {
+                $profile = $reseña->contrato->user->profile_picture;
+                if ($profile && !str_starts_with($profile, 'http')) {
+                    $reseña->contrato->user->profile_picture = asset(Storage::url($profile));
+                }
             }
 
             return $reseña;
