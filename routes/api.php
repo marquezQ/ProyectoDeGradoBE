@@ -22,6 +22,7 @@ Route::get(('/user/{id}'), [AuthController::class, 'getUser']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/user/{id}', [AuthController::class, 'updateUser']);
+Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 

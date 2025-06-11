@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerificationMail;
 class AuthController extends Controller
 {
     public function register(Request $request)
@@ -30,6 +31,8 @@ class AuthController extends Controller
             ];
             return response()->json($data, 400);
         }
+        // Generar código de verificación
+        $verificationCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
 
         $filePath = '';
         if($request->hasFile('profile_picture')){
@@ -44,15 +47,19 @@ class AuthController extends Controller
             'phone_number' => $request->phone_number,
             'profile_picture' => $filePath,
             'password' => $request->password,
+            'email_verified' => false,
+            'verification_code' => $verificationCode,
 
         ]);
         if(!$user){
             $data = [
-                'message' => 'Error al crear estudiante',
+                'message' => 'Error al crear usuario',
                 'status' => 500
             ];
             return response()->json($data, 500);
         }
+        // Enviar correo con código de verificación
+        Mail::to($user->email)->send(new VerificationMail($verificationCode));
 
         $token = $user->createToken($request->name);
 
@@ -202,4 +209,25 @@ class AuthController extends Controller
             'status' => 200
         ], 200);
     }
+
+    public function verifyEmail(Request $request)
+    {   
+        $request->validate([
+        'email' => 'required|email',
+        'verification_code' => 'required|digits:4'
+        ]);
+
+        $user = User::where('email', $request->email)
+                ->where('verification_code', $request->verification_code)
+                ->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Código incorrecto o usuario no encontrado'], 400);
+        }
+        $user->email_verified = true;
+        $user->verification_code = null;
+        $user->save();
+
+        return response()->json(['message' => 'Correo verificado exitosamente.', 'user' => $user]);
+}
 }
