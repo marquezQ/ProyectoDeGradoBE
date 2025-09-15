@@ -12,34 +12,42 @@ class TrabajadorController extends Controller
 {
     public function index()
     {
-    $trabajadors = Trabajador::with('user')->get();
+    $trabajadors = Trabajador::with([
+            'user',
+            'contratos.reseña.calificacion'
+        ])
+        ->withCount(['reseñas as totalReviews']) // SQL cuenta reseñas
+        ->orderByDesc('totalReviews')
+        ->get();
 
     $trabajadors = $trabajadors->map(function ($trabajador) {
-        // Decodificar las imágenes almacenadas en formato JSON
-        $images = json_decode($trabajador->images, true);
-
-        // Construir las rutas completas para cada imagen
-        if ($images) {
+        // Imágenes
+        $imagesJson = $trabajador->getRawOriginal('images');
+        $images = $imagesJson ? json_decode($imagesJson, true) : null;
+        if (is_array($images)) {
             $images = array_map(fn($path) => asset(Storage::url($path)), $images);
+        } else {
+            $images = null;
         }
         $trabajador->images = $images;
 
-        // Procesar la imagen de perfil del usuario si existe
+        // Imagen de perfil del usuario
         if ($trabajador->user && $trabajador->user->profile_picture) {
             $trabajador->user->profile_picture = asset(Storage::url($trabajador->user->profile_picture));
         }
 
-        // Contar total de reseñas (cantidad de contratos que tienen reseña)
-        $totalReviews = $trabajador->contratos()->has('reseña')->count();
-
-        // Calcular promedio de calificaciones
-        $averageRating = $trabajador->contratos()
-            ->join('reseñas', 'contratos.id', '=', 'reseñas.contrato_id')
-            ->join('calificacions', 'reseñas.id', '=', 'calificacions.reseña_id')
-            ->avg('calificacions.final');
-
-        $trabajador->totalReviews = $totalReviews;
-        $trabajador->averageRating = round($averageRating, 2);
+        // Promedio en PHP (seguimos seguros)
+        $ratings = [];
+        foreach ($trabajador->contratos as $contrato) {
+            if (
+                isset($contrato->reseña) &&
+                isset($contrato->reseña->calificacion) &&
+                isset($contrato->reseña->calificacion->final)
+            ) {
+                $ratings[] = (float) $contrato->reseña->calificacion->final;
+            }
+        }
+        $trabajador->averageRating = count($ratings) ? round(array_sum($ratings) / count($ratings), 2) : 0;
 
         return $trabajador;
     });
