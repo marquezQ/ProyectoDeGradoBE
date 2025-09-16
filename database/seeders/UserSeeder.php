@@ -122,7 +122,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Daniel';
     $user->lastname = 'Valenzuela';
-    $user->email = "daniel.valenzuela@gmail.com";
+    $user->email = "daniel@gmail.com";
     $user->phone_number = '70011011';
     $user->profile_picture = 'profile_pictures/clientePerfil1.png';
     $user->password = '123456';
@@ -132,7 +132,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Melvi';
     $user->lastname = 'Cabero';
-    $user->email = "melvi.cabero@gmail.com";
+    $user->email = "melvi@gmail.com";
     $user->phone_number = '70112012';
     $user->profile_picture = 'profile_pictures/clientePerfil2.png';
     $user->password = '123456';
@@ -142,7 +142,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Raul';
     $user->lastname = 'Dominguez Lopez';
-    $user->email = "raul.dominguez@gmail.com";
+    $user->email = "raul@gmail.com";
     $user->phone_number = '70213013';
     $user->profile_picture = 'profile_pictures/clienteperfil3.png';
     $user->password = '123456';
@@ -152,7 +152,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Renato';
     $user->lastname = 'Perez Quisbert';
-    $user->email = "renato.perez@gmail.com";
+    $user->email = "renato@gmail.com";
     $user->phone_number = '70314014';
     $user->profile_picture = 'profile_pictures/clientePerfil4.png';
     $user->password = '123456';
@@ -162,7 +162,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Sonia Sofia';
     $user->lastname = 'Vaca';
-    $user->email = "sonia.vaca@gmail.com";
+    $user->email = "sonia@gmail.com";
     $user->phone_number = '70415015';
     $user->profile_picture = 'profile_pictures/clienteperfil5.png';
     $user->password = '123456';
@@ -172,7 +172,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Edwin';
     $user->lastname = 'Lazcano Justiniano';
-    $user->email = "edwin.lazcano@gmail.com";
+    $user->email = "edwin@gmail.com";
     $user->phone_number = '70516016';
     $user->profile_picture = 'profile_pictures/clienteperfil6.png';
     $user->password = '123456';
@@ -182,7 +182,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Felipe';
     $user->lastname = 'Vargas';
-    $user->email = "felipe.vargas@gmail.com";
+    $user->email = "felipe@gmail.com";
     $user->phone_number = '70617017';
     $user->profile_picture = 'profile_pictures/clienteperfil7.png';
     $user->password = '123456';
@@ -192,7 +192,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Teodoro';
     $user->lastname = 'Villa';
-    $user->email = "teodoro.villa@gmail.com";
+    $user->email = "teodoro@gmail.com";
     $user->phone_number = '70718018';
     $user->profile_picture = 'profile_pictures/clientePerfil8.png';
     $user->password = '123456';
@@ -202,7 +202,7 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->name = 'Willian';
     $user->lastname = 'Cruz';
-    $user->email = "willian.cruz@gmail.com";
+    $user->email = "willian@gmail.com";
     $user->phone_number = '70819019';
     $user->profile_picture = 'profile_pictures/clienteperfil9.png';
     $user->password = '123456';
