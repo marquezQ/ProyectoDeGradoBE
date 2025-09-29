@@ -152,8 +152,10 @@ private function getAddress(float $lat, float $lng): string
             }
             $trabajador->images = $images;
 
-            if($trabajador->user && $trabajador->user->profile_picture){
-                $trabajador->user->profile_picture = asset(Storage::url($trabajador->user->profile_picture));
+            if ($trabajador->user) {
+                $trabajador->user->profile_picture = $trabajador->user->profile_picture
+                    ? asset(Storage::url($trabajador->user->profile_picture))
+                    : null;
             }
             $totalReviews = $trabajador->contratos()->has('reseña')->count();
             // Calcular promedio de calificaciones
