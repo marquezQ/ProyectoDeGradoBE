@@ -87,7 +87,7 @@ class ReseniaSeeder extends Seeder
         $reseña->comment = 'Encargué un marco tallado clásico con mucha moldura. El precio fue bastante alto y la ejecución tardó más de lo esperado, pero el resultado final realmente valió la pena. Ahora que tengo el trabajo en mis manos, puedo decir que la calidad y el detalle superaron mis expectativas. Sin duda, fue un esfuerzo que mereció la espera y el costo';
         $reseña->recommend = true;
         $reseña->images = json_encode([
-            "image1" => "imagesReseña/recoTallador1.jpg",
+            "image1" => "imagesReseña/recoTallador1.png",
         ]);
         $reseña->save();
         
