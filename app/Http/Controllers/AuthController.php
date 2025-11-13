@@ -59,7 +59,7 @@ class AuthController extends Controller
             return response()->json($data, 500);
         }
         // Enviar correo con código de verificación
-        Mail::to($user->email)->send(new VerificationMail($verificationCode));
+        // Mail::to($user->email)->send(new VerificationMail($verificationCode));
 
         $token = $user->createToken($request->name);
 
