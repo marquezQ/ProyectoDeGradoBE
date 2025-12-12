@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContractAcceptedMail;
+use App\Mail\ContractRejectedMail;
+use App\Mail\NewContractMail;
 use App\Models\Contrato;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Mail;
 class ContratoController extends Controller
 {
     public function index(){
@@ -49,7 +52,7 @@ class ContratoController extends Controller
                 'status' => 500,
             ], 500);
         }
-
+        Mail::to($contrato->trabajador->user->email)->send(new NewContractMail($contrato));
         return response()->json([
             'contrato' => $contrato,
             'status' => 201,
@@ -112,7 +115,8 @@ class ContratoController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:pendiente,aceptado,rechazado,finalizado'
+            'status' => 'required|in:pendiente,aceptado,rechazado,finalizado',
+            'reason' => 'required_if:status,rechazado|string|max:500'
         ]);
 
         if ($validator->fails()) {
@@ -124,7 +128,19 @@ class ContratoController extends Controller
         }
 
         $contrato->status = $request->status;
+        // Si el nuevo estado es rechazado, guardar la razón
+        if ($request->status === 'rechazado') {
+            $contrato->reason_rejected = $request->reason;
+        }
         $contrato->save();
+        // Enviar correo según estado
+        $userCliente = $contrato->user; // asumiendo relación `client()` en Contrato
+
+        if ($request->status === 'aceptado') {
+            Mail::to($userCliente->email)->send(new ContractAcceptedMail($userCliente, $contrato));
+        }elseif ($request->status === 'rechazado') {
+            Mail::to($userCliente->email)->send(new ContractRejectedMail($userCliente, $contrato));
+        }
 
         return response()->json([
             'contract' => $contrato,

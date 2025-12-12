@@ -32,7 +32,7 @@
             font-size: 32px;
             font-weight: bold;
             color: #fff;
-            background: #007BFF;
+            background: #2C0E06;
             display: inline-block;
             padding: 10px 20px;
             border-radius: 5px;

@@ -25,6 +25,7 @@ return new class extends Migration
                 ->onDelete('set null');
             $table->string('title');
             $table->string('status');
+            $table->string('reason_rejected')->nullable();
             $table->timestamp('start_date');
             $table->timestamp('end_date');
             $table->json('details');

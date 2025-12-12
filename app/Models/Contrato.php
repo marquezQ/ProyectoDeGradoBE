@@ -14,6 +14,7 @@ class Contrato extends Model
         'start_date',
         'end_date',
         'details',
+        'reason_rejected'
     ];
 
     public function user(){
