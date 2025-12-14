@@ -48,7 +48,7 @@
 
         <!-- Botón -->
         <div style="text-align: center; margin-top: 25px;">
-            <a href="https://app.servicapp.me/workers/workerProfile/{{ $contract->trabajador->id }}"
+            <a href="{{ config('urls.current_app') }}workers/workerProfile/{{ $contract->trabajador->id }}"
                style="
                     background-color: #2C0E06;
                     color: #fff;

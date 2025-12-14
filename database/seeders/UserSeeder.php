@@ -106,10 +106,10 @@ class UserSeeder extends Seeder
     
     //10 juan rosales
     $user = new User();
-    $user->name = 'Juan Fernando';
-    $user->lastname = 'Rosales Artemar';
-    $user->email = "juan@gmail.com";
-    $user->phone_number = '60740238';
+    $user->name = 'Daniel';
+    $user->lastname = 'Carpinpro';
+    $user->email = "daniel.carpinpro@hotmail.com";
+    $user->phone_number = '60606060';
     $user->profile_picture = 'profile_pictures/perfilPa.png';
     $user->password = '123456';
     $user->save();
@@ -207,6 +207,15 @@ class UserSeeder extends Seeder
     $user->profile_picture = 'profile_pictures/clienteperfil9.png';
     $user->password = '123456';
     $user->save();
-
+    
+    // 20. Pedro Marquez
+    $user = new User();
+    $user->name = 'Pedro';
+    $user->lastname = 'Marquez Quiroz';
+    $user->email = "pedro.marquez.quiroz@gmail.com";
+    $user->phone_number = '69496787';
+    $user->profile_picture = 'profile_pictures/clienteperfil9.png';
+    $user->password = '123456';
+    $user->save();
     }
 }

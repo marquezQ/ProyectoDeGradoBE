@@ -38,7 +38,7 @@
 
         <!-- Botón -->
         <div style="text-align: center; margin-top: 25px;">
-            <a href="https://app.servicapp.me/workers/workerProfile/{{ $trabajador->id }}"
+            <a href="{{ config('urls.current_app') }}workers/workerProfile/{{ $trabajador->id }}"
                style="background-color: #2C0E06; color: #fff; padding: 12px 20px; text-decoration: none; 
                       border-radius: 6px; font-size: 16px; display: inline-block;">
                 Ver contrato
