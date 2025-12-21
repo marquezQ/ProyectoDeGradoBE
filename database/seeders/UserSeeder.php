@@ -217,5 +217,16 @@ class UserSeeder extends Seeder
     $user->profile_picture = 'profile_pictures/clienteperfil9.png';
     $user->password = '123456';
     $user->save();
+
+    // 21. admin
+    $user = new User();
+    $user->name = 'super';
+    $user->lastname = 'admin';
+    $user->email = "admin@gmail.com";
+    $user->phone_number = '69496787';
+    $user->profile_picture = 'profile_pictures/clienteperfil9.png';
+    $user->password = '123456';
+    $user->role = 'admin';
+    $user->save();
     }
 }

@@ -52,7 +52,7 @@ class ContratoController extends Controller
                 'status' => 500,
             ], 500);
         }
-        Mail::to($contrato->trabajador->user->email)->send(new NewContractMail($contrato));
+        // Mail::to($contrato->trabajador->user->email)->send(new NewContractMail($contrato));
         return response()->json([
             'contrato' => $contrato,
             'status' => 201,
@@ -137,9 +137,9 @@ class ContratoController extends Controller
         $userCliente = $contrato->user; // asumiendo relación `client()` en Contrato
 
         if ($request->status === 'aceptado') {
-            Mail::to($userCliente->email)->send(new ContractAcceptedMail($userCliente, $contrato));
+            // Mail::to($userCliente->email)->send(new ContractAcceptedMail($userCliente, $contrato));
         }elseif ($request->status === 'rechazado') {
-            Mail::to($userCliente->email)->send(new ContractRejectedMail($userCliente, $contrato));
+            // Mail::to($userCliente->email)->send(new ContractRejectedMail($userCliente, $contrato));
         }
 
         return response()->json([

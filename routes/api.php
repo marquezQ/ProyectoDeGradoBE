@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContratoController;
 use App\Http\Controllers\ProductoController;
@@ -53,5 +54,29 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/productos/{id}', [ProductoController::class, 'productsByTrabajadorId']);
     Route::put('/productos/{id}', [ProductoController::class, 'update']);
     Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
+// RUTAS DE ADMINISTRADOR
+    Route::middleware(['admin'])->prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'getDashboardStats']);
+        
+        // Usuarios
+        Route::get('/users', [AdminController::class, 'getAllUsers']);
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+        
+        // Carpinteros
+        Route::get('/carpinteros', [AdminController::class, 'getAllCarpinteros']);
+        Route::delete('/carpinteros/{id}', [AdminController::class, 'deleteCarpintero']);
+        
+        // Productos
+        Route::get('/productos', [AdminController::class, 'getAllProductos']);
+        Route::delete('/productos/{id}', [AdminController::class, 'deleteProducto']);
+        
+        // Reseñas
+        Route::get('/reseñas', [AdminController::class, 'getAllReseñas']);
+        Route::delete('/reseñas/{id}', [AdminController::class, 'deleteReseña']);
+        
+        // Contratos
+        Route::get('/contratos', [AdminController::class, 'getAllContratos']);
+        Route::delete('/contratos/{id}', [AdminController::class, 'deleteContrato']);
+    });
 });
 

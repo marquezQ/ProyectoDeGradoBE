@@ -25,7 +25,8 @@ class User extends Authenticatable
         'phone_number',
         'profile_picture',
         'password',
-        'verification_code'
+        'verification_code',
+        'role',
     ];
 
     /**
@@ -69,5 +70,9 @@ class User extends Authenticatable
             'id',           // clave primaria en la tabla origen (users)
             'id'            // clave primaria en la tabla intermedia (contratos)
         )->with(['calificacion', 'contrato.trabajador.user']);
+    }
+    public function isAdmin(): bool
+    {
+    return $this->role === 'admin';
     }
 }
