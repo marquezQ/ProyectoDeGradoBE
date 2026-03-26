@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Trabajador;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\VerificationMail;
+use App\Services\AuthService;
+
 class AuthController extends Controller
 {
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(),[
@@ -19,47 +22,29 @@ class AuthController extends Controller
             'lastname' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'phone_number' => 'required|max:255',
-            'profile_picture' => 'image|mimes:jpg,jpeg,png,webp|max:20480', // máx. 20MB
+            'profile_picture' => 'image|mimes:jpg,jpeg,png,webp|max:20480',
             'password' => 'required'
         ]);
 
         if($validator->fails()){
-            $data = [
+            return response()->json([
                 'message' => 'Error en la validacion de datos',
                 'errors' => $validator->errors(),
                 'status' => 400
-            ];
-            return response()->json($data, 400);
-        }
-        // Generar código de verificación
-        $verificationCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
-
-        $filePath = '';
-        if($request->hasFile('profile_picture')){
-            $file = $request->file('profile_picture');
-            $filePath = $file->store('profile_pictures', 'public');
+            ], 400);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'lastname' => $request->lastname,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'profile_picture' => $filePath,
-            'password' => $request->password,
-            'email_verified' => false,
-            'verification_code' => $verificationCode,
+        $user = $this->authService->registerUser(
+            $request->except('profile_picture'),
+            $request->file('profile_picture')
+        );
 
-        ]);
         if(!$user){
-            $data = [
+            return response()->json([
                 'message' => 'Error al crear usuario',
                 'status' => 500
-            ];
-            return response()->json($data, 500);
+            ], 500);
         }
-        // Enviar correo con código de verificación
-        // Mail::to($user->email)->send(new VerificationMail($verificationCode));
 
         $token = $user->createToken($request->name);
 
@@ -72,13 +57,13 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|',
+            'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = $this->authService->loginUser($request->only('email', 'password'));
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user) {
             return [
                 'errors' => [
                     'email' => ['The provided credentials are incorrect.']
@@ -103,58 +88,34 @@ class AuthController extends Controller
         ];
     }
 
-    public function isTrabajador($id){
-        $trabajador = Trabajador::where('user_id', $id)
-                // ->with('user')
-                ->first();
+    public function isTrabajador($id)
+    {
+        $trabajador = $this->authService->getTrabajadorByUserId($id);
+
         if($trabajador){
             return $trabajador;
         }
+
         return [
             'message' => 'El usuario no existe o no es trabajador'
         ];
     }
+
     public function getUser($user_id)
     {
-        $usuario = User::find($user_id);
-        if (!$usuario) {
+        $datos = $this->authService->getUserData($user_id);
+
+        if (!$datos) {
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
-        $usuario->profile_picture = $usuario->profile_picture
-            ? asset(Storage::url($usuario->profile_picture))
-            : null;
 
-       
-        $trabajador = Trabajador::where('user_id', $user_id)->first();
-        if ($trabajador) {
-            // Cargamos la relación *una vez* y después mutamos el campo
-            $trabajador->load('user');
-            $trabajador->user->profile_picture = $usuario->profile_picture;
-
-            return response()->json([
-                'datos' => $trabajador
-            ], 200);
-        }
-        //creamos un objeto que contenta user para adeacuerdos al type del front
-        $res = [
-            'user' => $usuario,
-        ];
-        // Si no hay trabajador, devolvemos el usuario formateado
         return response()->json([
-            'datos' => $res
+            'datos' => $datos
         ], 200);
     }
     
     public function updateUser(Request $request, $id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json([
-                'message' => 'Usuario no encontrado',
-                'status' => 404
-            ], 404);
-        }
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'lastname' => 'required|max:255',
@@ -171,37 +132,21 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $user->name = $request->name;
-        $user->lastname = $request->lastname;
-        $user->email = $request->email;
-        $user->phone_number = $request->phone_number;
+        $removePicture = $request->has('remove_profile_picture') && $request->remove_profile_picture == "1";
 
-        // Eliminar imagen si se solicita
-        if ($request->has('remove_profile_picture') && $request->remove_profile_picture == "1") {
-            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
-                Storage::disk('public')->delete($user->profile_picture);
-            }
-            $user->profile_picture = null;
+        $user = $this->authService->updateUserData(
+            $id,
+            $request->except('profile_picture'),
+            $request->file('profile_picture'),
+            $removePicture
+        );
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Usuario no encontrado',
+                'status' => 404
+            ], 404);
         }
-
-        // Subir nueva imagen si se envía
-        if ($request->hasFile('profile_picture')) {
-            // Eliminar imagen anterior si existe
-            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
-                Storage::disk('public')->delete($user->profile_picture);
-            }
-            // Guardar nueva imagen
-            $file = $request->file('profile_picture');
-            $filePath = $file->store('profile_pictures', 'public');
-            $user->profile_picture = $filePath;
-        }
-
-        $user->save();
-
-        // Formatear la imagen para la respuesta
-        $user->profile_picture = $user->profile_picture
-            ? asset(Storage::url($user->profile_picture))
-            : null;
 
         return response()->json([
             'message' => 'Usuario actualizado correctamente',
@@ -213,21 +158,16 @@ class AuthController extends Controller
     public function verifyEmail(Request $request)
     {   
         $request->validate([
-        'email' => 'required|email',
-        'verification_code' => 'required|digits:4'
+            'email' => 'required|email',
+            'verification_code' => 'required|digits:4'
         ]);
 
-        $user = User::where('email', $request->email)
-                ->where('verification_code', $request->verification_code)
-                ->first();
+        $user = $this->authService->verifyUserEmail($request->all());
 
         if (!$user) {
             return response()->json(['message' => 'Código incorrecto o usuario no encontrado'], 400);
         }
-        $user->email_verified = true;
-        $user->verification_code = null;
-        $user->save();
 
         return response()->json(['message' => 'Correo verificado exitosamente.', 'user' => $user]);
-}
+    }
 }

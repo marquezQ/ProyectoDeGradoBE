@@ -2,49 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Producto;
-use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ProductoService;
+
 class ProductoController extends Controller
 {
-    public function index(){
-        $products = Producto::all();
-        $data = [
+    protected $productoService;
+
+    // Inyectamos el Servicio a través del constructor (Inyección de Dependencias)
+    public function __construct(ProductoService $productoService)
+    {
+        $this->productoService = $productoService;
+    }
+
+    public function index()
+    {
+        // El controlador ya no hace "Producto::all()", se lo pide al servicio
+        $products = $this->productoService->getAllProducts();
+        
+        return response()->json([
             'products' => $products,
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
 
     public function productsByTrabajadorId($id)
-{
-    $trabajador = Trabajador::find($id);
+    {
+        $productos = $this->productoService->getProductsByTrabajador($id);
 
-    if (!$trabajador) {
+        if ($productos === null) {
+            return response()->json([
+                'error' => 'Trabajador no encontrado',
+                'status' => 404
+            ], 404);
+        }
+
         return response()->json([
-            'error' => 'Trabajador no encontrado',
-            'status' => 404
-        ], 404);
+            'products' => $productos,
+            'status' => 200
+        ], 200);
     }
 
-    $productos = $trabajador->productos;
-
-    $productos->transform(function ($producto) {
-        if ($producto->image) { // Cambiar "image" al nombre real de la columna en tu tabla de productos
-            $producto->image = asset(Storage::url($producto->image));
-        }
-        return $producto;
-    });
-
-    return response()->json([
-        'products' => $productos,
-        'status' => 200
-    ], 200);
-}
-
-    public function store(Request $request){
+    public function store(Request $request)
+    {
+        // 1. El controlador es responsable de validar
         $validator = Validator::make($request->all(), [
             'trabajador_id' => 'required',
             'name' => 'required',
@@ -60,105 +62,80 @@ class ProductoController extends Controller
             ], 400);
         }
 
-        $filePath = '';
-        if($request->hasFile('image')){
-            $file = $request->file('image');
-            $filePath = $file->store('products', 'public');
-        }
-        $product = Producto::create([
-            'trabajador_id' => $request->trabajador_id,
-            'name' => $request->name,
-            'stock' => $request->stock,
-            'price' => $request->price,
-            'image' => $filePath
-        ]);
+        // 2. Delegamos la lógica de guardar archivo y crear en Base de Datos al Servicio
+        $product = $this->productoService->createProduct(
+            $request->except('image'), 
+            $request->file('image')    
+        );
 
-        if(!$product){
-            $data = [
+        if (!$product) {
+            return response()->json([
                 'message' => 'Error al crear producto',
                 'status' => 500
-            ];
-            return response()->json($data, 500);
+            ], 500);
         }
         
-        $data = [
+        // 3. Devolvemos la respuesta
+        return response()->json([
             'product' => $product,
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
 
     public function update(Request $request, $id)
     {
-    $product = Producto::find($id);
+        $validator = Validator::make($request->all(), [
+            'trabajador_id' => 'required',
+            'name' => 'required',
+            'stock' => 'required',
+            'price' => 'required',
+            'image' => 'nullable|file'
+        ]);
 
-    if (!$product) {
-        return response()->json([
-            'message' => 'Producto no encontrado',
-            'status' => 404
-        ], 404);
-    }
-
-    $validator = Validator::make($request->all(), [
-        'trabajador_id' => 'required',
-        'name' => 'required',
-        'stock' => 'required',
-        'price' => 'required',
-        'image' => 'nullable|file'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => 'Error en la validación de datos',
-            'errors' => $validator->errors(),
-            'status' => 400
-        ], 400);
-    }
-
-    $product->trabajador_id = $request->trabajador_id;
-    $product->name = $request->name;
-    $product->stock = $request->stock;
-    $product->price = $request->price;
-
-    if ($request->hasFile('image')) {
-        // Eliminar la imagen anterior si existe
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación de datos',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ], 400);
         }
-        // Guardar la nueva imagen
-        $filePath = $request->file('image')->store('products', 'public');
-        $product->image = $filePath;
+
+        // El servicio se encarga de buscar, borrar imagen vieja, guardar nueva y actualizar DB
+        $product = $this->productoService->updateProduct(
+            $id,
+            $request->except('image'),
+            $request->file('image')
+        );
+
+        if (!$product) {
+            return response()->json([
+                'message' => 'Producto no encontrado',
+                'status' => 404
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Producto actualizado correctamente',
+            'product' => $product,
+            'status' => 200
+        ], 200);
     }
 
-    $product->save();
-
-    return response()->json([
-        'message' => 'Producto actualizado correctamente',
-        'product' => $product,
-        'status' => 200
-    ], 200);
-}
     public function destroy($id)
     {
-    $product = Producto::find($id);
+        // El servicio se encarga de borrar la imagen del Storage y el registro en BD
+        $deleted = $this->productoService->deleteProduct($id);
 
-    if (!$product) {
+        if (!$deleted) {
+            return response()->json([
+                'message' => 'Producto no encontrado',
+                'status' => 404
+            ], 404);
+        }
+
         return response()->json([
-            'message' => 'Producto no encontrado',
-            'status' => 404
-        ], 404);
+            'message' => 'Producto eliminado correctamente',
+            'status' => 200
+        ], 200);
     }
-
-    if ($product->image) {
-        Storage::disk('public')->delete($product->image);
-    }
-
-    $product->delete();
-
-    return response()->json([
-        'message' => 'Producto eliminado correctamente',
-        'status' => 200
-    ], 200);
-    }
-
 }
